@@ -89,8 +89,8 @@ input[type=checkbox]{width:22px;height:22px;vertical-align:middle}
  <input type="text" id="nm" placeholder="你的名字" maxlength="8">
  <div class="row" id="lvs"><b>電腦難度：</b><button class="btn y" data-l="0">易</button><button class="btn" data-l="1">中</button><button class="btn" data-l="2">難</button></div>
  <button class="btn" id="bSolo">🤖 單人對電腦</button>
- <button class="btn g" id="bHost">🏠 開房間（雙人 1P）</button>
- <div class="row"><input type="tel" id="jc" placeholder="輸入房號" maxlength="4"><button class="btn y" id="bJoin">🚪 加入房間（2P）</button></div>
+ <button class="btn g" id="bHost">🏠 雙人對戰（1P）</button>
+ <div class="row"><input type="tel" id="jc" placeholder="輸入房號" maxlength="4"><button class="btn y" id="bJoin">🚪 加入對戰（2P）</button></div>
  <button class="btn r" onclick="show('s-id')">返回</button>
 </div>
 
@@ -146,7 +146,8 @@ const CHARS=[
 {name:'搖頭三太子',prop:'🔱',c:{s:'#e0a878',h:'#2a1a12',b:'#c0282a',a:'#e0a878',p:'#222',sh:'#222',ex:[[6,4,8,1,'#2a1a12'],[5,12,1,7,'#111'],[14,12,1,7,'#111'],[8,14,4,2,'#e8b923'],[9,17,2,2,'#2f9a5a'],[6,8,2,1,'#d33'],[12,8,2,1,'#d33'],[7,12,6,1,'#4aa3e8'],[9,12,1,1,'#e8b923']]},atk:'乾坤刺線',nfx:{fk:'ram',fx:'🔱'},sk:{n:'百萬鞭炮轟頂',v:30,fk:'rain',fx:'🧨',cnt:8},df:{n:'符咒起靈',k:'reflect',fx:'🧧',cnt:4,d:'符咒環繞，擋下下次攻擊並反彈12'}},
 {name:'黑眼圈肝帝',prop:'💻',c:{s:'#e0c4a0',h:'#111',b:'#6a7aa0',a:'#6a7aa0',p:'#3a3f55',sh:'#222',ex:[[5,1,10,3,'#111'],[4,2,2,4,'#111'],[14,2,2,4,'#111'],[7,0,2,2,'#111'],[11,0,2,1,'#111'],[6,6,3,1,'#bcd'],[11,6,3,1,'#bcd'],[6,8,3,1,'#bcd'],[11,8,3,1,'#bcd'],[7,14,1,5,'#3a4a7a'],[12,14,1,5,'#3a4a7a'],[5,16,10,1,'#3a4a7a'],[15,15,4,5,'#3fb34f'],[16,16,1,1,'#d33'],[9,15,2,2,'#fff']]},atk:'鍵盤敲擊',nfx:{fk:'throw',fx:'⌨️',cnt:1},sk:{n:'系統宕機射線',v:32,fk:'throw',fx:'❌',cnt:6,pierce:1},df:{n:'綠色乖乖鎮壓',k:'guard',fx:'🟩',cnt:5,d:'乖乖環繞，下次受傷減7成並回10'}},
 {name:'麥克風獨家姐',prop:'🎤',c:{s:'#f0c8a8',h:'#141420',b:'#1d2442',a:'#1d2442',p:'#1d2442',sh:'#111',ex:[[5,1,10,4,'#141420'],[4,3,2,7,'#141420'],[14,3,2,7,'#141420'],[6,4,8,1,'#141420'],[8,12,4,3,'#fff'],[9,15,2,2,'#4a6ab0']]},atk:'麥克風塞嘴',nfx:{fk:'ram',fx:'🎤'},sk:{n:'獨家爆料閃光',v:24,fk:'rain',fx:'📸',cnt:6,stun:1},df:{n:'逐字稿反殺',k:'reflect',fx:'📰',sh:'front',d:'新聞稿看板擋下下次攻擊並反彈12'}},
-{name:'山洞哥不靈',prop:'🪵',c:{s:'#8fb860',h:'#8fb860',b:'#e8e8e8',a:'#8fb860',p:'#b08850',sh:'#4a3020',ex:[[8,0,3,2,'#b8a8c8'],[9,1,1,1,'#b8a8c8'],[3,6,3,2,'#8fb860'],[14,6,3,2,'#8fb860'],[2,5,1,1,'#8fb860'],[17,5,1,1,'#8fb860'],[7,6,2,2,'#fff'],[11,6,2,2,'#fff'],[8,7,1,1,'#111'],[12,7,1,1,'#111'],[9,8,3,2,'#a89880'],[10,10,1,1,'#a33'],[5,12,2,7,'#f0e4c0'],[13,12,2,7,'#f0e4c0'],[4,11,12,1,'#5a4030'],[5,17,10,1,'#6a4a2a'],[3,15,2,1,'#c08a40'],[0,10,2,13,'#8a5a30'],[0,12,1,1,'#5a3a20'],[2,15,1,1,'#5a3a20'],[0,9,3,2,'#a06a38']]},atk:'大木棒猛擊',nfx:{fk:'charge',fx:'🪵'},sk:{n:'哥布林一起強大',v:32,fk:'horde',cnt:8},df:{n:'回山洞',k:'heal',v:30,fk:'cave',fx:'⛰️',d:'躲進山洞5秒後出來，回復30血'}}
+{name:'山洞哥不靈',prop:'🪵',c:{s:'#8fb860',h:'#8fb860',b:'#e8e8e8',a:'#8fb860',p:'#b08850',sh:'#4a3020',ex:[[8,0,3,2,'#b8a8c8'],[9,1,1,1,'#b8a8c8'],[3,6,3,2,'#8fb860'],[14,6,3,2,'#8fb860'],[2,5,1,1,'#8fb860'],[17,5,1,1,'#8fb860'],[7,6,2,2,'#fff'],[11,6,2,2,'#fff'],[8,7,1,1,'#111'],[12,7,1,1,'#111'],[9,8,3,2,'#a89880'],[10,10,1,1,'#a33'],[5,12,2,7,'#f0e4c0'],[13,12,2,7,'#f0e4c0'],[4,11,12,1,'#5a4030'],[5,17,10,1,'#6a4a2a'],[3,15,2,1,'#c08a40'],[0,10,2,13,'#8a5a30'],[0,12,1,1,'#5a3a20'],[2,15,1,1,'#5a3a20'],[0,9,3,2,'#a06a38']]},atk:'大木棒猛擊',nfx:{fk:'charge',fx:'🪵'},sk:{n:'哥布林一起強大',v:32,fk:'horde',cnt:8},df:{n:'回山洞',k:'heal',v:30,fk:'cave',fx:'⛰️',d:'躲進山洞5秒後出來，回復30血'}},
+{name:'間諜抖尼亞',prop:'🔫',c:{s:'#f8e0c8',h:'#f08a8a',b:'#1d1d28',a:'#1d1d28',p:'#f8e0c8',sh:'#111',ex:[[6,4,8,1,'#f08a8a'],[5,4,1,5,'#f08a8a'],[14,4,1,5,'#f08a8a'],[3,2,2,4,'#111'],[15,2,2,4,'#111'],[1,3,2,14,'#111'],[17,3,2,14,'#111'],[1,17,2,2,'#f08a8a'],[17,17,2,2,'#f08a8a'],[4,0,2,3,'#58a8d8'],[14,0,2,3,'#58a8d8'],[6,5,3,1,'#6a3a2a'],[11,5,3,1,'#6a3a2a'],[7,6,2,2,'#3fae6a'],[11,6,2,2,'#3fae6a'],[8,7,1,1,'#111'],[12,7,1,1,'#111'],[8,12,4,1,'#fff'],[9,13,2,1,'#e8b923'],[9,15,2,1,'#e8b923'],[5,19,10,2,'#1d1d28'],[0,19,4,2,'#666'],[0,21,2,2,'#444'],[16,19,4,2,'#666'],[18,21,2,2,'#444']]},atk:'雙槍連射',nfx:{fk:'shoot',fx:'•'},sk:{n:'00漆',v:30,fk:'paint',fx:'🪣'},df:{n:'哇酷哇酷撐傘',k:'umb',fk:'umb',fx:'☂️',sh:'umb',d:'前方撐起雨傘，下次受到的傷害降低60%'}}
 ];
 const $=s=>document.querySelector(s),PFX='phydg68875-',GMID=PFX+'gm',PW='68875',L='ＡＢＣＤ';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -186,9 +187,10 @@ function buildBg(){const b=$('#bgs'),t=BGN.concat(['🎲 隨機']);b.style.displ
 const base=()=>location.href.split('#')[0];
 function qr(el,url){el.innerHTML='';if(typeof QRCode==='undefined'||location.protocol==='file:'){el.textContent=location.protocol==='file:'?'（需先把本檔放到網站上，QR 才能讓學生掃描）':url;return}new QRCode(el,{text:url,width:210,height:210,correctLevel:QRCode.CorrectLevel.M})}
 try{$('#nm').value=localStorage.getItem('pdname')||''}catch(e){}
-(function(){const m=location.hash.match(/^#r(\d{4})$/);if(m){$('#jc').value=m[1];show('s-menu');toast('已帶入房號 '+m[1]+'，輸入名字後按「加入房間」')}})();
+(function(){const m=location.hash.match(/^#r(\d{4})$/);if(m){$('#jc').value=m[1];show('s-menu');toast('已帶入房號 '+m[1]+'，輸入名字後按「加入對戰」')}})();
 function keepAwake(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&V.on)keepAwake()});
+function splashFx(B){for(let j=0;j<8;j++){const f=em(j<3?'🎨':'🔥',B.x+(Math.random()*90-45),B.y+(Math.random()*120-70),j<3?36:56);f.style.opacity=0;f.animate([{transform:'scale(.3)',opacity:1},{transform:'scale(1.2) translateY(-20px)',opacity:1,offset:.5},{transform:'scale(1) translateY(-60px)',opacity:0}],{duration:1600,delay:j*120,fill:'forwards'}).onfinish=()=>f.remove()}}
 /* ===== 題庫索引 / 電腦難度 / 山洞 ===== */
 const QI={};if(window.QUESTION_BANK)QUESTION_BANK.sections.forEach(s=>[...s.easy,...s.mid].forEach(q=>QI[q.id]=q));
 const AIP=[{t:[5,10],f:.3},{t:[1,5],f:.1},{t:[1,1],f:.05}];let aiLv=0;
@@ -238,7 +240,7 @@ function act(i,a){if(G.ph!=='ask'&&G.ph!=='pick')return;if(G.ph!=='pick'||G.turn
  if(G.ps[i].ai)later(()=>{let c=q.answer;if(Math.random()<AIP[aiLv].f){const w=q.options.map((_,x)=>x).filter(x=>x!==c);c=w[Math.floor(Math.random()*w.length)]}ans(i,c)},(AIP[aiLv].t[0]+Math.random()*(AIP[aiLv].t[1]-AIP[aiLv].t[0]))*1000)}
 function bad(i){const p=G.ps[i];p.vuln=1;lg(`${p.n} 答錯了，防禦出現破綻（受傷增加）`);ev(i,'miss','答錯')}
 function hit(i,d,nm,o,k){const t=1-i,A=G.ps[i],B=G.ps[t];d=Math.round(d*k);let m=`${A.n} 使出「${nm}」${k<1?`（速度×${Math.round(k*100)}%）`:''}`;
- if(B.sh&&!o.pierce){const s=B.sh;B.sh=null;if(s==='reflect'){d=0;A.hp=Math.max(0,A.hp-Math.round(12*(B.shm||1)));m+='，被反彈！'}else if(s==='dodge'){d=0;m+='，被閃過！'}else{d=Math.round(d*.3);m+='，被防禦減傷'}}
+ if(B.sh&&!o.pierce){const s=B.sh;B.sh=null;if(s==='reflect'){d=0;A.hp=Math.max(0,A.hp-Math.round(12*(B.shm||1)));m+='，被反彈！'}else if(s==='dodge'){d=0;m+='，被閃過！'}else{d=Math.round(d*(s==='umb'?.4:.3));m+='，被防禦減傷'}}
  if(B.vuln&&d>0){d=Math.round(d*1.5);B.vuln=0;m+='（對手破綻×1.5）'}
  B.hp=Math.max(0,B.hp-d);if(o.stun&&d>0&&Math.random()<.3){B.stun=1;m+='，對手暈眩！'}lg(m+` → ${d}傷害`);ev(i,'atk',nm,{dmg:d,to:t,fx:o.fx||'💥',fk:o.fk||'throw',cnt:o.cnt||1,ax:o.ax})}
 function def(i,ch,k){const p=G.ps[i],d=ch.df;let m=`${p.n} 使出「${d.n}」`;
@@ -303,7 +305,7 @@ function pos(i){const f=$('#f'+i);return{x:f.offsetLeft+f.offsetWidth/2,y:f.offs
 function em(t,x,y,sz){const p=document.createElement('div');p.textContent=t;p.style.cssText=`position:absolute;left:${x-sz/2}px;top:${y-sz/2}px;font-size:${sz}px;line-height:1;z-index:6;pointer-events:none`;$('.arena').appendChild(p);return p}
 function fly(t,a,b,sz,dl,du,arc,rot){const p=em(t,a.x,a.y,sz);p.style.opacity=0;p.animate([{transform:'none',opacity:1},{transform:`translate(${(b.x-a.x)/2}px,${(b.y-a.y)/2-arc}px) rotate(${rot/2}deg)`,opacity:1,offset:.5},{transform:`translate(${b.x-a.x}px,${b.y-a.y}px) rotate(${rot}deg)`,opacity:1}],{duration:du,delay:dl,fill:'forwards'}).onfinish=()=>p.remove()}
 function shd(i,p){const f=$('#f'+i);let d=f.querySelector('.shd');if(!d){d=document.createElement('div');d.className='shd';f.appendChild(d)}const c=CHARS[p.ch].df,k=p.sh&&c.sh!=='none'?p.ch+p.sh:'';if(d.dataset.k===k)return;d.dataset.k=k;d.innerHTML='';if(!k)return;const E=c.shfx||c.fx,mk=(t,st)=>{const e=document.createElement('span');e.textContent=t;e.style.cssText=st;d.appendChild(e)};
- if(c.sh==='front')[0,1].forEach(j=>mk(E,`bottom:${j*8}px;${i?'right':'left'}:calc(100% + ${j*40-10}px)`));
+ if(c.sh==='umb')mk(E,`font-size:120px;top:5%;${i?'right':'left'}:calc(100% - 18px)`);else if(c.sh==='front')[0,1].forEach(j=>mk(E,`bottom:${j*8}px;${i?'right':'left'}:calc(100% + ${j*40-10}px)`));
  else{const n=c.cnt||4;for(let j=0;j<n;j++){const a=j/n*6.283;mk(E,`left:calc(${50+52*Math.cos(a)}% - 23px);top:calc(${50+48*Math.sin(a)}% - 23px);animation-delay:${j*.06}s`)}}}
 async function anim(e){const A=pos(e.who),B=pos(e.to!=null?e.to:1-e.who),f=$('#f'+e.who),k=e.fk||'throw',n=e.cnt||1,rn=(a,b)=>a+Math.random()*(b-a);
  if(e.type==='atk'){sfx('atk');let h=550;
@@ -311,11 +313,13 @@ async function anim(e){const A=pos(e.who),B=pos(e.to!=null?e.to:1-e.who),f=$('#f
   else if(k==='ram')fly(e.fx,{x:A.x,y:A.y+40},{x:B.x,y:B.y+40},76,0,550,0,0);
   else if(k==='drop'){const p=em(e.fx,B.x,0,130);p.animate([{transform:'none'},{transform:`translateY(${B.y-B.h/2+60}px)`}],{duration:600,easing:'ease-in',fill:'forwards'}).onfinish=()=>{p.textContent=e.ax||'💥';p.animate([{opacity:1},{opacity:0}],{duration:600}).onfinish=()=>p.remove()};h=600}
   else if(k==='rain'){for(let j=0;j<n;j++){const p=em(e.fx,B.x+rn(-70,70),0,46);p.style.opacity=0;p.animate([{transform:'none',opacity:1},{transform:`translateY(${B.y+rn(-30,40)}px)`,opacity:1}],{duration:450,delay:j*130,easing:'ease-in',fill:'forwards'}).onfinish=()=>p.remove()}h=450+(n-1)*130}
+  else if(k==='shoot'){const sg=B.x>A.x?1:-1;for(let j=0;j<2;j++){const b=document.createElement('div');b.style.cssText=`position:absolute;left:${A.x+sg*50}px;top:${A.y+8+j*14}px;width:30px;height:8px;background:#ffe45a;border:2px solid #ff9a00;z-index:6;opacity:0;pointer-events:none`;$('.arena').appendChild(b);b.animate([{transform:'none',opacity:1},{transform:`translateX(${B.x-A.x-sg*90}px)`,opacity:1}],{duration:260,delay:j*220,fill:'forwards'}).onfinish=()=>b.remove();setTimeout(()=>{const fl=em('💥',A.x+sg*60,A.y+12+j*14,34);fl.animate([{opacity:1},{opacity:0}],{duration:200}).onfinish=()=>fl.remove()},j*220)}h=480}
+  else if(k==='paint'){fly('🪣',{x:A.x,y:A.y-30},{x:B.x,y:B.y-20},64,0,650,110,260);h=650}
   else if(k==='horde'){const ci=V.s.ps[e.who].ch,sg=B.x>A.x?1:-1,n=e.cnt||8;for(let j=0;j<n;j++){const w=document.createElement('div');w.style.cssText=`position:absolute;left:${A.x-30}px;top:${A.y+A.h/2-72-rn(0,50)}px;z-index:5;opacity:0;pointer-events:none`;const cv=sprite(CHARS[ci].c,3);cv.style.filter='drop-shadow(1px 0 0 #111) drop-shadow(-1px 0 0 #111) drop-shadow(0 1px 0 #111)';if(sg<0)cv.style.transform='scaleX(-1)';w.appendChild(cv);$('.arena').appendChild(w);const d=B.x-A.x-sg*40;w.animate([{transform:'none',opacity:1},{transform:`translate(${d*.25}px,-18px)`,opacity:1,offset:.25},{transform:`translate(${d*.5}px,0)`,opacity:1,offset:.5},{transform:`translate(${d*.75}px,-18px)`,opacity:1,offset:.75},{transform:`translate(${d}px,0)`,opacity:1}],{duration:800,delay:j*110,fill:'forwards'}).onfinish=()=>w.remove()}h=800+(n-1)*110}
   else if(k==='charge'){const sg=B.x>A.x?1:-1,d=B.x-A.x-sg*90,c=em(e.fx,A.x+sg*70,A.y+30,64);
    f.animate([{transform:'none'},{transform:`translateX(${d}px)`,offset:.4},{transform:`translateX(${d}px)`,offset:.5},{transform:`translate(${d/2}px,-110px)`,offset:.75},{transform:'none'}],{duration:1500});
    c.animate([{transform:'none',opacity:1},{transform:`translateX(${d}px)`,opacity:1,offset:.4},{transform:`translateX(${d}px)`,opacity:1,offset:.55},{transform:`translateX(${d}px)`,opacity:0}],{duration:1500,fill:'forwards'}).onfinish=()=>c.remove();h=600}
-  await wait(h);sfx(e.dmg?'hit':'block');const T=$('#f'+e.to);T.classList.add('sh');setTimeout(()=>T.classList.remove('sh'),400);flt(e.to,e.dmg?'-'+e.dmg:'MISS',e.dmg?'#ff5a5a':'#ccc')}
+  await wait(h);if(k==='paint'&&e.dmg)splashFx(B);sfx(e.dmg?'hit':'block');const T=$('#f'+e.to);T.classList.add('sh');setTimeout(()=>T.classList.remove('sh'),400);flt(e.to,e.dmg?'-'+e.dmg:'MISS',e.dmg?'#ff5a5a':'#ccc')}
  else if(e.type==='heal'){sfx('heal');
   if(k==='sip'){const p=em(e.fx,A.x+(e.who?-40:40),A.y+30,56),u='translateY(-50px) rotate(-20deg)';p.animate([{transform:'none'},{transform:u},{transform:'none'},{transform:u},{transform:'none'}],{duration:1200}).onfinish=()=>p.remove()}
   else if(k==='box'){const p=em('🎁',A.x,A.y-A.h/2,80);p.animate([{transform:'rotate(0)'},{transform:'rotate(-18deg)'},{transform:'rotate(18deg)'},{transform:'rotate(-18deg)'},{transform:'rotate(18deg) scale(1.3)'},{transform:'scale(.2)',opacity:0}],{duration:1100}).onfinish=()=>{p.textContent='✨';p.animate([{transform:'scale(.5)',opacity:1},{transform:'scale(2)',opacity:0}],{duration:600}).onfinish=()=>p.remove()}}
@@ -349,7 +353,7 @@ function coverBG(){const x=$('#cvbg').getContext('2d'),W=160,H=90,sr=i=>Math.abs
  R(0,60,W,30,'#2a1010');for(let y=62;y<H;y+=4)R(0,y,W,1,'#4a1a14');
  for(let i=-12;i<=12;i++)for(let y=60;y<H;y++)R(80+i*9*(y-52)/8,y,1,1,'#4a1a14');
  for(let k=0;k<W;k++){const f=4+sr(k)*7+Math.sin(k/3)*2;R(k,60-f,1,f,'#ff6a00');R(k,60-f,1,Math.ceil(f/3),'#ffd84a')}}
-(function(){const row=$('#cvrow');coverBG();
+(function(){const row=$('#cvrow');coverBG();const bu=$('#cvbg').toDataURL();['s-id','s-menu'].forEach(id=>{const e=document.getElementById(id);e.style.background=`linear-gradient(#000a,#000c),url(${bu}) center/100% 100% no-repeat`;e.style.imageRendering='pixelated'});
  const sc=Math.max(3,Math.min(9,Math.floor(Math.min(innerWidth/(CHARS.length*21),innerHeight*.34/24))));
  CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='cvc';d.style.cssText=`animation-delay:${i*.15}s;margin-bottom:${Math.abs(i-(CHARS.length-1)/2)*sc*2.2}px`;d.appendChild(sprite(c.c,sc));const n=document.createElement('div');n.textContent=c.name;d.appendChild(n);row.appendChild(d)});
  const cv=$('#s-cover');for(let i=0;i<28;i++){const e=document.createElement('i');e.className='em';e.style.cssText=`left:${Math.random()*100}%;animation-duration:${4+Math.random()*6}s;animation-delay:${-Math.random()*8}s`;cv.appendChild(e)}
