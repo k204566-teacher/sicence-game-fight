@@ -66,9 +66,10 @@ input[type=checkbox]{width:22px;height:22px;vertical-align:middle}
 .start{font-size:clamp(22px,3vw,34px);animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:.3}}
 .em{position:absolute;bottom:-8px;width:5px;height:5px;background:#ffb400;box-shadow:0 0 6px #ff6a00;animation:up linear infinite;z-index:2;pointer-events:none}
 @keyframes up{to{transform:translate(30px,-105vh);opacity:0}}
-#toast{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c0283a;border:3px solid #fff;padding:8px 16px;display:none;z-index:9}
+#qm{position:fixed;inset:0;background:#000c;z-index:15;display:none;align-items:center;justify-content:center;padding:10px}#qm.on{display:flex}.qcard{width:min(960px,100%);max-height:94vh;overflow:auto;background:#1f1b4a;border:4px solid #fff;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:6px 6px 0 #000}#qtm{text-align:center;color:#ffd84a;font-size:22px}.qcard .q{font-size:24px}.qcard .opt{font-size:21px}
+#toast{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c0283a;border:3px solid #fff;padding:8px 16px;display:none;z-index:30}
 </style></head><body>
-<div id="toast"></div><button class="btn" id="snd">🔊</button>
+<div id="toast"></div><div id="qm"></div><button class="btn" id="snd">🔊</button>
 
 <div id="s-cover" class="scr on">
  <canvas id="cvbg" width="160" height="90"></canvas><div class="rays"></div><div id="cvfl"></div>
@@ -86,6 +87,7 @@ input[type=checkbox]{width:22px;height:22px;vertical-align:middle}
 <div id="s-menu" class="scr">
  <h1>學生選單</h1>
  <input type="text" id="nm" placeholder="你的名字" maxlength="8">
+ <div class="row" id="lvs"><b>電腦難度：</b><button class="btn y" data-l="0">易</button><button class="btn" data-l="1">中</button><button class="btn" data-l="2">難</button></div>
  <button class="btn" id="bSolo">🤖 單人對電腦</button>
  <button class="btn g" id="bHost">🏠 開房間（雙人 1P）</button>
  <div class="row"><input type="tel" id="jc" placeholder="輸入房號" maxlength="4"><button class="btn y" id="bJoin">🚪 加入房間（2P）</button></div>
@@ -143,13 +145,14 @@ const CHARS=[
 {name:'改裝神車',prop:'🛵',c:{s:'#d9a070',h:'#111',b:'#f2f2f2',a:'#d9a070',p:'#3b5a8a',sh:'#ddd',ex:[[5,0,10,3,'#111'],[4,1,2,5,'#111'],[14,1,2,5,'#111'],[3,14,2,1,'#335'],[3,16,2,1,'#335'],[15,15,2,1,'#335'],[9,12,2,1,'#e8c23a']]},atk:'壓車甩尾',nfx:{fk:'ram',fx:'🛵'},sk:{n:'高雄左轉衝刺',v:30,fk:'drop',fx:'🏍️',ax:'💥'},df:{n:'鑽車縫閃避',k:'dodge',fk:'sway',fx:'💨',sh:'none',d:'左右快速晃三次，閃避下次攻擊並回8血'}},
 {name:'搖頭三太子',prop:'🔱',c:{s:'#e0a878',h:'#2a1a12',b:'#c0282a',a:'#e0a878',p:'#222',sh:'#222',ex:[[6,4,8,1,'#2a1a12'],[5,12,1,7,'#111'],[14,12,1,7,'#111'],[8,14,4,2,'#e8b923'],[9,17,2,2,'#2f9a5a'],[6,8,2,1,'#d33'],[12,8,2,1,'#d33'],[7,12,6,1,'#4aa3e8'],[9,12,1,1,'#e8b923']]},atk:'乾坤刺線',nfx:{fk:'ram',fx:'🔱'},sk:{n:'百萬鞭炮轟頂',v:30,fk:'rain',fx:'🧨',cnt:8},df:{n:'符咒起靈',k:'reflect',fx:'🧧',cnt:4,d:'符咒環繞，擋下下次攻擊並反彈12'}},
 {name:'黑眼圈肝帝',prop:'💻',c:{s:'#e0c4a0',h:'#111',b:'#6a7aa0',a:'#6a7aa0',p:'#3a3f55',sh:'#222',ex:[[5,1,10,3,'#111'],[4,2,2,4,'#111'],[14,2,2,4,'#111'],[7,0,2,2,'#111'],[11,0,2,1,'#111'],[6,6,3,1,'#bcd'],[11,6,3,1,'#bcd'],[6,8,3,1,'#bcd'],[11,8,3,1,'#bcd'],[7,14,1,5,'#3a4a7a'],[12,14,1,5,'#3a4a7a'],[5,16,10,1,'#3a4a7a'],[15,15,4,5,'#3fb34f'],[16,16,1,1,'#d33'],[9,15,2,2,'#fff']]},atk:'鍵盤敲擊',nfx:{fk:'throw',fx:'⌨️',cnt:1},sk:{n:'系統宕機射線',v:32,fk:'throw',fx:'❌',cnt:6,pierce:1},df:{n:'綠色乖乖鎮壓',k:'guard',fx:'🟩',cnt:5,d:'乖乖環繞，下次受傷減7成並回10'}},
-{name:'麥克風獨家姐',prop:'🎤',c:{s:'#f0c8a8',h:'#141420',b:'#1d2442',a:'#1d2442',p:'#1d2442',sh:'#111',ex:[[5,1,10,4,'#141420'],[4,3,2,7,'#141420'],[14,3,2,7,'#141420'],[6,4,8,1,'#141420'],[8,12,4,3,'#fff'],[9,15,2,2,'#4a6ab0']]},atk:'麥克風塞嘴',nfx:{fk:'ram',fx:'🎤'},sk:{n:'獨家爆料閃光',v:24,fk:'rain',fx:'📸',cnt:6,stun:1},df:{n:'逐字稿反殺',k:'reflect',fx:'📰',sh:'front',d:'新聞稿看板擋下下次攻擊並反彈12'}}
+{name:'麥克風獨家姐',prop:'🎤',c:{s:'#f0c8a8',h:'#141420',b:'#1d2442',a:'#1d2442',p:'#1d2442',sh:'#111',ex:[[5,1,10,4,'#141420'],[4,3,2,7,'#141420'],[14,3,2,7,'#141420'],[6,4,8,1,'#141420'],[8,12,4,3,'#fff'],[9,15,2,2,'#4a6ab0']]},atk:'麥克風塞嘴',nfx:{fk:'ram',fx:'🎤'},sk:{n:'獨家爆料閃光',v:24,fk:'rain',fx:'📸',cnt:6,stun:1},df:{n:'逐字稿反殺',k:'reflect',fx:'📰',sh:'front',d:'新聞稿看板擋下下次攻擊並反彈12'}},
+{name:'山洞哥不靈',prop:'🪵',c:{s:'#8fb860',h:'#8fb860',b:'#e8e8e8',a:'#8fb860',p:'#b08850',sh:'#4a3020',ex:[[8,0,3,2,'#b8a8c8'],[9,1,1,1,'#b8a8c8'],[3,6,3,2,'#8fb860'],[14,6,3,2,'#8fb860'],[2,5,1,1,'#8fb860'],[17,5,1,1,'#8fb860'],[7,6,2,2,'#fff'],[11,6,2,2,'#fff'],[8,7,1,1,'#111'],[12,7,1,1,'#111'],[9,8,3,2,'#a89880'],[10,10,1,1,'#a33'],[5,12,2,7,'#f0e4c0'],[13,12,2,7,'#f0e4c0'],[4,11,12,1,'#5a4030'],[5,17,10,1,'#6a4a2a'],[3,15,2,1,'#c08a40'],[0,10,2,13,'#8a5a30'],[0,12,1,1,'#5a3a20'],[2,15,1,1,'#5a3a20'],[0,9,3,2,'#a06a38']]},atk:'大木棒猛擊',nfx:{fk:'charge',fx:'🪵'},sk:{n:'哥布林一起強大',v:32,fk:'horde',cnt:8},df:{n:'回山洞',k:'heal',v:30,fk:'cave',fx:'⛰️',d:'躲進山洞5秒後出來，回復30血'}}
 ];
 const $=s=>document.querySelector(s),PFX='phydg68875-',GMID=PFX+'gm',PW='68875',L='ＡＢＣＤ';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const TURN_SEC=60,DECAY_MIN=0.5;/* 每回合秒數／效果最低比例，可自行修改 */
 let bgSel=-1,mode='',name='',selc=0,peer,gc,sp=[],gmConn,gmTimer,room,G,POOL,END,V={me:0,on:false,key:'',ev:0},gmPeer,rooms={},spc,conn;
-function show(id){document.querySelectorAll('.scr').forEach(e=>e.classList.toggle('on',e.id===id))}
+function show(id){const qm=$('#qm');if(qm)qm.classList.remove('on');document.querySelectorAll('.scr').forEach(e=>e.classList.toggle('on',e.id===id))}
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2500)}
 function sprite(c,sc){const cv=document.createElement('canvas');cv.width=20;cv.height=24;cv.style.cssText=`width:${20*sc}px;height:${24*sc}px;image-rendering:pixelated;filter:drop-shadow(2px 0 0 #111) drop-shadow(-2px 0 0 #111) drop-shadow(0 2px 0 #111) drop-shadow(0 -2px 0 #111)`;const x=cv.getContext('2d'),r=(a,b,w,h,k)=>{x.fillStyle=k;x.fillRect(a,b,w,h)};
  r(6,4,8,7,c.s);r(9,11,2,1,c.s);r(5,12,10,7,c.b);r(3,12,2,7,c.a);r(15,12,2,7,c.a);r(3,19,2,2,c.s);r(15,19,2,2,c.s);r(6,19,3,4,c.p);r(11,19,3,4,c.p);r(5,23,4,1,c.sh);r(11,23,4,1,c.sh);r(6,2,8,3,c.h);r(8,7,1,1,'#111');r(11,7,1,1,'#111');r(9,9,2,1,'#a33');
@@ -184,6 +187,15 @@ const base=()=>location.href.split('#')[0];
 function qr(el,url){el.innerHTML='';if(typeof QRCode==='undefined'||location.protocol==='file:'){el.textContent=location.protocol==='file:'?'（需先把本檔放到網站上，QR 才能讓學生掃描）':url;return}new QRCode(el,{text:url,width:210,height:210,correctLevel:QRCode.CorrectLevel.M})}
 try{$('#nm').value=localStorage.getItem('pdname')||''}catch(e){}
 (function(){const m=location.hash.match(/^#r(\d{4})$/);if(m){$('#jc').value=m[1];show('s-menu');toast('已帶入房號 '+m[1]+'，輸入名字後按「加入房間」')}})();
+function keepAwake(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&V.on)keepAwake()});
+/* ===== 題庫索引 / 電腦難度 / 山洞 ===== */
+const QI={};if(window.QUESTION_BANK)QUESTION_BANK.sections.forEach(s=>[...s.easy,...s.mid].forEach(q=>QI[q.id]=q));
+const AIP=[{t:[5,10],f:.3},{t:[1,5],f:.1},{t:[1,1],f:.05}];let aiLv=0;
+(function(){const mk=()=>document.querySelectorAll('#lvs button').forEach(b=>b.classList.toggle('y',+b.dataset.l===aiLv));document.querySelectorAll('#lvs button').forEach(b=>b.onclick=()=>{aiLv=+b.dataset.l;mk()})})();
+function caveCv(sc){const c=document.createElement('canvas');c.width=20;c.height=14;c.style.cssText=`width:${20*sc}px;height:${14*sc}px;image-rendering:pixelated;filter:drop-shadow(2px 0 0 #111) drop-shadow(-2px 0 0 #111) drop-shadow(0 -2px 0 #111)`;const x=c.getContext('2d'),R=(a,b,w,h,k)=>{x.fillStyle=k;x.fillRect(a,b,w,h)};
+ for(let y=0;y<14;y++){const w=Math.round(10*Math.sqrt(1-((13-y)/14)**2));R(10-w,y,2*w,1,y%4<2?'#8a7a68':'#7a6a58')}
+ R(6,8,8,6,'#0a0a0a');R(7,7,6,1,'#0a0a0a');R(8,6,4,1,'#0a0a0a');[[4,4],[14,6],[8,2],[16,10],[3,9]].forEach(([a,b])=>R(a,b,2,1,'#a89880'));return c}
 /* ===== 身分 / 選單 ===== */
 if(!window.QUESTION_BANK)$('#err').style.display='block';
 $('#bStu').onclick=()=>show('s-menu');
@@ -204,7 +216,7 @@ $('#bChapOk').onclick=()=>{const ids=[...document.querySelectorAll('#chl .sec in
 
 /* ===== 角色 ===== */
 function goChar(){const g=$('#cg');g.innerHTML='';CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='card';d.appendChild(sprite(c.c,5));d.append(c.name);d.onclick=()=>pickChar(i);g.appendChild(d)});pickChar(0);buildBg();show('s-char')}
-function pickChar(i){selc=i;[...$('#cg').children].forEach((e,k)=>e.classList.toggle('sel',k===i));const c=CHARS[i];$('#cd').innerHTML=`<b>${c.name}</b> ${c.prop}<br>👊 普攻：${c.atk}（答易題，傷害15）<br>⚡ 技能A：${c.sk.n}（答中題，傷害${c.sk.v}${c.sk.stun?'，暈眩對手':''}${c.sk.pierce?'，無視防禦':''}）<br>🛡 技能B：${c.df.n}（答中題，${c.df.d}）`}
+function pickChar(i){selc=i;[...$('#cg').children].forEach((e,k)=>e.classList.toggle('sel',k===i));const c=CHARS[i];$('#cd').innerHTML=`<b>${c.name}</b> ${c.prop}<br>👊 普攻：${c.atk}（答易題，傷害15）<br>⚡ 技能A：${c.sk.n}（答中題，傷害${c.sk.v}${c.sk.stun?'，30%機率暈眩對手':''}${c.sk.pierce?'，無視防禦':''}）<br>🛡 技能B：${c.df.n}（答中題，${c.df.d}）`}
 $('#bCharOk').onclick=()=>{if(mode==='solo')startSolo();else if(mode==='host')createRoom();else joinRoom()};
 
 /* ===== 遊戲引擎（單人 / 房主） ===== */
@@ -215,27 +227,27 @@ const lg=t=>G.log.push(t),ev=(who,type,txt,o={})=>{G.ev=Object.assign({n:++G.evn
 function pub(){return{bg:G.bg,rem:(G.ph==='pick'||G.ph==='ask')?Math.max(0,G.tEnd-Date.now()):0,ph:G.ph,turn:G.turn,q:G.q,log:G.log.slice(-3),ev:G.ev,win:G.win,ps:G.ps.map(p=>({n:p.n,ch:p.ch,hp:p.hp,stun:p.stun,vuln:p.vuln,sh:p.sh,ai:p.ai}))}}
 function broadcast(m){[gc,...sp].forEach(c=>c&&c.open&&c.send(m))}
 function push(){const s=pub();draw(s);broadcast({t:'st',s});gmSend()}
-function startSolo(){newGame();let o;do{o=Math.floor(Math.random()*CHARS.length)}while(o===selc&&CHARS.length>1);G.ps[1]=mk('電腦',o,true);V={me:0,on:true,key:'',ev:0};END=null;startBattle()}
+function startSolo(){newGame();let o;do{o=Math.floor(Math.random()*CHARS.length)}while(o===selc&&CHARS.length>1);G.ps[1]=mk('電腦'+['（易）','（中）','（難）'][aiLv],o,true);V={me:0,on:true,key:'',ev:0};END=null;startBattle()}
 function startBattle(){lg('戰鬥開始！');V.me=0;V.on=true;turnStart()}
 function turnStart(){const p=G.ps[G.turn];p.vuln=0;
  if(p.stun){p.stun=0;lg(`${p.n} 暫停一回合！`);ev(G.turn,'miss','暫停');G.turn^=1;G.ph='res';G.q=null;push();later(turnStart,1500);return}
  G.ph='pick';G.q=null;G.tEnd=Date.now()+TURN_SEC*1000;const k=++G.tc;later(()=>{if(G.tc===k)tmo()},TURN_SEC*1000+300);push();if(p.ai)later(()=>act(1,Math.random()<.35?'s':(p.hp<40&&Math.random()<.5)?'d':'n'),1300)}
 function tmo(){if(G.ph==='pick'){const p=G.ps[G.turn];lg(`${p.n} 超時，回合跳過`);ev(G.turn,'miss','超時');G.ph='res';push();later(()=>{G.turn^=1;turnStart()},1500)}else if(G.ph==='ask')ans(G.turn,-1)}
 function pickQ(k){let a=POOL[k].length?POOL[k]:POOL.easy,f=a.filter(q=>!POOL.used.has(q.id));if(!f.length){a.forEach(q=>POOL.used.delete(q.id));f=a}const q=f[Math.floor(Math.random()*f.length)];POOL.used.add(q.id);return q}
-function act(i,a){if(G.ph!=='ask'&&G.ph!=='pick')return;if(G.ph!=='pick'||G.turn!==i)return;const k=a==='n'?'easy':'mid',q=pickQ(k);G.cur={a,k};G.qq=q;G.q={h:q.question,o:q.options,k};G.qT=Date.now();G.ph='ask';push();
- if(G.ps[i].ai)later(()=>{let c=q.answer;if(Math.random()>(k==='easy'?.7:.5)){const w=q.options.map((_,x)=>x).filter(x=>x!==c);c=w[Math.floor(Math.random()*w.length)]}ans(i,c)},2000+Math.random()*9000)}
+function act(i,a){if(G.ph!=='ask'&&G.ph!=='pick')return;if(G.ph!=='pick'||G.turn!==i)return;const k=a==='n'?'easy':'mid',q=pickQ(k);G.cur={a,k};G.qq=q;G.q={id:q.id,k};G.qT=Date.now();G.ph='ask';push();
+ if(G.ps[i].ai)later(()=>{let c=q.answer;if(Math.random()<AIP[aiLv].f){const w=q.options.map((_,x)=>x).filter(x=>x!==c);c=w[Math.floor(Math.random()*w.length)]}ans(i,c)},(AIP[aiLv].t[0]+Math.random()*(AIP[aiLv].t[1]-AIP[aiLv].t[0]))*1000)}
 function bad(i){const p=G.ps[i];p.vuln=1;lg(`${p.n} 答錯了，防禦出現破綻（受傷增加）`);ev(i,'miss','答錯')}
 function hit(i,d,nm,o,k){const t=1-i,A=G.ps[i],B=G.ps[t];d=Math.round(d*k);let m=`${A.n} 使出「${nm}」${k<1?`（速度×${Math.round(k*100)}%）`:''}`;
  if(B.sh&&!o.pierce){const s=B.sh;B.sh=null;if(s==='reflect'){d=0;A.hp=Math.max(0,A.hp-Math.round(12*(B.shm||1)));m+='，被反彈！'}else if(s==='dodge'){d=0;m+='，被閃過！'}else{d=Math.round(d*.3);m+='，被防禦減傷'}}
  if(B.vuln&&d>0){d=Math.round(d*1.5);B.vuln=0;m+='（對手破綻×1.5）'}
- B.hp=Math.max(0,B.hp-d);if(o.stun&&d>0){B.stun=1;m+='，對手暈眩！'}lg(m+` → ${d}傷害`);ev(i,'atk',nm,{dmg:d,to:t,fx:o.fx||'💥',fk:o.fk||'throw',cnt:o.cnt||1,ax:o.ax})}
+ B.hp=Math.max(0,B.hp-d);if(o.stun&&d>0&&Math.random()<.3){B.stun=1;m+='，對手暈眩！'}lg(m+` → ${d}傷害`);ev(i,'atk',nm,{dmg:d,to:t,fx:o.fx||'💥',fk:o.fk||'throw',cnt:o.cnt||1,ax:o.ax})}
 function def(i,ch,k){const p=G.ps[i],d=ch.df;let m=`${p.n} 使出「${d.n}」`;
  if(d.k==='heal'||(d.k==='gacha'&&Math.random()<.8)){const v=Math.round((d.k==='heal'?d.v:30)*k);p.hp=Math.min(100,p.hp+v);m+=`，回復${v}血`;ev(i,'heal','+'+v,{fx:d.fx,fk:d.fk})}
  else{p.sh=d.k==='gacha'?'guard':d.k;p.shm=k;if(d.k==='dodge')p.hp=Math.min(100,p.hp+Math.round(8*k));if(d.k==='guard')p.hp=Math.min(100,p.hp+Math.round(10*k));m+='，進入防禦姿態';ev(i,'heal','🛡',{fx:d.fx,fk:d.fk})}lg(m)}
 function ans(i,c){if(G.ph!=='ask'||G.turn!==i)return;const p=G.ps[i],q=G.qq,a=G.cur,ok=c===q.answer,ch=CHARS[p.ch],el=(Date.now()-G.qT)/1000,m=ok?Math.max(DECAY_MIN,1-(1-DECAY_MIN)*el/TURN_SEC):1;p.tot++;
- if(ok)p.ok++;else p.wr.push({k:a.k,h:q.question,o:q.options,a:q.answer,c,e:q.explanation||''});
+ if(ok)p.ok++;else p.wr.push({k:a.k,id:q.id,c});
  G.ph='res';G.q=null;
- if(a.a==='n'){if(ok)hit(i,15,ch.atk,ch.nfx,m);else{p.stun=1;lg(`${p.n} 答錯了，下回合暫停！`);ev(i,'miss','答錯')}}
+ if(a.a==='n'){if(ok)hit(i,15,ch.atk,ch.nfx,m);else{lg(`${p.n} 答錯了，本回合攻擊失敗！`);ev(i,'miss','攻擊失敗')}}
  else if(a.a==='s'){ok?hit(i,ch.sk.v,ch.sk.n,ch.sk,m):bad(i)}
  else ok?def(i,ch,m):bad(i);
  if(G.ps.some(x=>x.hp<=0))finish(G.ps[0].hp>0?0:G.ps[1].hp>0?1:-1);else{push();later(()=>{G.turn^=1;turnStart()},2000)}}
@@ -244,27 +256,34 @@ function hostRecv(i,m){if(!G)return;if(m.t==='act')act(i,m.a);else if(m.t==='ans
 function send(m){if(mode==='host'||mode==='solo')hostRecv(0,m);else if(conn)conn.send(m)}
 
 /* ===== 雙人：房主 ===== */
-function createRoom(){const code=1000+Math.floor(Math.random()*9000);let p=peer=new Peer(PFX+'r'+code);
- p.on('open',()=>{room=code;newGame();V={me:0,on:true,key:'',ev:0};END=null;$('#code').textContent=code;qr($('#qrl'),base()+'#r'+code);show('s-lobby');gmTimer=setInterval(()=>{if(!gmConn||!gmConn.open)connGM();else gmSend()},5000);connGM()});
+function createRoom(){const code=1000+Math.floor(Math.random()*9000);let p=peer=new Peer(PFX+'r'+code),opened=false;
+ p.on('open',()=>{if(opened)return;opened=true;room=code;newGame();V={me:0,on:true,key:'',ev:0};END=null;$('#code').textContent=code;qr($('#qrl'),base()+'#r'+code);show('s-lobby');keepAwake();gmTimer=setInterval(()=>{if(!gmConn||!gmConn.open)connGM();else gmSend()},5000);connGM()});
+ p.on('disconnected',()=>{try{if(!p.destroyed)p.reconnect()}catch(e){}});
  p.on('error',e=>{if(e.type==='unavailable-id'){p.destroy();createRoom()}else if(e.type!=='peer-unavailable'){toast('連線錯誤：'+e.type)}});
  p.on('connection',c=>{c.on('data',d=>{if(!G)return;
   if(d.t==='spec'){sp.push(c);c.on('close',()=>sp=sp.filter(x=>x!==c));if(G.ph!=='wait'){c.send({t:'st',s:pub()});if(G.ph==='over')c.send({t:'end',s:pub(),rv:G.rv})}}
-  else if(d.t==='join'){if(G.ph!=='wait'||(gc&&gc.open)){c.send({t:'full'});return}gc=c;G.ps[1]=mk(String(d.n).slice(0,8),d.ch|0);c.on('close',()=>{if(gc===c&&G&&G.ph!=='over'&&G.ph!=='wait'){lg('對手離線');finish(0)}});startBattle()}
+  else if(d.t==='join'){const same=G.gid&&G.gid===d.cid;
+   if(!same&&(G.ph!=='wait'||(gc&&gc.open))){c.send({t:'full'});return}
+   gc=c;G.gid=d.cid;
+   c.on('close',()=>{if(gc===c&&G&&G.ph!=='over'&&G.ph!=='wait'){lg('對手離線');finish(0)}});
+   if(same){c.send({t:'st',s:pub()});if(G.ph==='over')c.send({t:'end',s:pub(),rv:G.rv});return}
+   G.ps[1]=mk(String(d.n).slice(0,8),d.ch|0);startBattle()}
   else if(gc===c)hostRecv(1,d)})})}
 function connGM(){if(!peer||peer.destroyed)return;try{gmConn=peer.connect(GMID,{serialization:'json'});gmConn.on('open',gmSend)}catch(e){}}
 function gmSend(){if(mode!=='host'||!gmConn||!gmConn.open||!G)return;gmConn.send({t:'room',code:room,ph:G.ph,n:G.ps.map(p=>p?p.n:'（等待中）'),ch:G.ps.map(p=>p?CHARS[p.ch].name:''),hp:G.ps.map(p=>p?p.hp:0)})}
 
 /* ===== 雙人：2P ===== */
-function joinRoom(){V={me:1,on:true,key:'',ev:0};END=null;peer=new Peer();
- peer.on('open',()=>{conn=peer.connect(PFX+'r'+room,{serialization:'json'});conn.on('open',()=>conn.send({t:'join',n:name,ch:selc}));conn.on('data',onMsg);conn.on('close',()=>{if(V.on&&!END){toast('連線中斷');exit()}})});
- peer.on('error',e=>{toast(e.type==='peer-unavailable'?'找不到此房號':'連線錯誤：'+e.type);exit()})}
+function joinRoom(){V={me:1,on:true,key:'',ev:0};END=null;const cid=Math.random().toString(36).slice(2);peer=new Peer();keepAwake();
+ peer.on('open',()=>{if(conn)return;conn=peer.connect(PFX+'r'+room,{serialization:'json'});conn.on('open',()=>conn.send({t:'join',n:name,ch:selc,cid}));conn.on('data',onMsg);conn.on('close',()=>{if(V.on&&!END){toast('連線中斷');exit()}})});
+ peer.on('disconnected',()=>{try{if(peer&&!peer.destroyed)peer.reconnect()}catch(e){}});
+ peer.on('error',e=>{if(e.type==='peer-unavailable'){toast('找不到此房號');exit()}else if(!V.joined){toast('連線錯誤：'+e.type);exit()}else toast('網路不穩：'+e.type)})}
 function onMsg(d){if(!V.on)return;
- if(d.t==='st')draw(d.s);else if(d.t==='end')setTimeout(()=>{if(V.on)showEnd(d.s,d.rv)},1700);
- else if(d.t==='full'){toast('房間已滿或已開始');exit()}else if(d.t==='close'){toast('房間已關閉');exit()}}
+ if(d.t==='st'){V.joined=1;draw(d.s)}else if(d.t==='end')setTimeout(()=>{if(V.on)showEnd(d.s,d.rv)},1700);
+ else if(d.t==='full'){if(!V.joined){toast('房間已有其他玩家或已開始');exit()}}else if(d.t==='close'){toast('房間已關閉');exit()}}
 
 /* ===== 老師 GM ===== */
 function gmStart(){if(typeof Peer==='undefined')return toast('老師功能需要網路');mode='gm';rooms={};qr($('#qrg'),base());show('s-gm');$('#gst').textContent='連線中…';
- gmPeer=new Peer(GMID);gmPeer.on('open',()=>$('#gst').textContent='✅ 已上線，學生開房後會自動出現在下方');
+ gmPeer=new Peer(GMID);gmPeer.on('open',()=>$('#gst').textContent='✅ 已上線，學生開房後會自動出現在下方');gmPeer.on('disconnected',()=>{try{if(gmPeer&&!gmPeer.destroyed)gmPeer.reconnect()}catch(e){}});
  gmPeer.on('error',e=>{if(e.type==='unavailable-id'){toast('已有老師在線上，請稍候30秒再試');gmOut()}else if(e.type!=='peer-unavailable')$('#gst').textContent='連線錯誤：'+e.type});
  gmPeer.on('connection',c=>{c.on('data',d=>{if(d.t==='room'){c._c=d.code;rooms[d.code]=d;renderRooms()}});c.on('close',()=>{delete rooms[c._c];renderRooms()})})}
 function renderRooms(){const k=Object.keys(rooms),b=$('#rooms');if(!k.length){b.textContent='尚無房間';return}
@@ -292,6 +311,7 @@ async function anim(e){const A=pos(e.who),B=pos(e.to!=null?e.to:1-e.who),f=$('#f
   else if(k==='ram')fly(e.fx,{x:A.x,y:A.y+40},{x:B.x,y:B.y+40},76,0,550,0,0);
   else if(k==='drop'){const p=em(e.fx,B.x,0,130);p.animate([{transform:'none'},{transform:`translateY(${B.y-B.h/2+60}px)`}],{duration:600,easing:'ease-in',fill:'forwards'}).onfinish=()=>{p.textContent=e.ax||'💥';p.animate([{opacity:1},{opacity:0}],{duration:600}).onfinish=()=>p.remove()};h=600}
   else if(k==='rain'){for(let j=0;j<n;j++){const p=em(e.fx,B.x+rn(-70,70),0,46);p.style.opacity=0;p.animate([{transform:'none',opacity:1},{transform:`translateY(${B.y+rn(-30,40)}px)`,opacity:1}],{duration:450,delay:j*130,easing:'ease-in',fill:'forwards'}).onfinish=()=>p.remove()}h=450+(n-1)*130}
+  else if(k==='horde'){const ci=V.s.ps[e.who].ch,sg=B.x>A.x?1:-1,n=e.cnt||8;for(let j=0;j<n;j++){const w=document.createElement('div');w.style.cssText=`position:absolute;left:${A.x-30}px;top:${A.y+A.h/2-72-rn(0,50)}px;z-index:5;opacity:0;pointer-events:none`;const cv=sprite(CHARS[ci].c,3);cv.style.filter='drop-shadow(1px 0 0 #111) drop-shadow(-1px 0 0 #111) drop-shadow(0 1px 0 #111)';if(sg<0)cv.style.transform='scaleX(-1)';w.appendChild(cv);$('.arena').appendChild(w);const d=B.x-A.x-sg*40;w.animate([{transform:'none',opacity:1},{transform:`translate(${d*.25}px,-18px)`,opacity:1,offset:.25},{transform:`translate(${d*.5}px,0)`,opacity:1,offset:.5},{transform:`translate(${d*.75}px,-18px)`,opacity:1,offset:.75},{transform:`translate(${d}px,0)`,opacity:1}],{duration:800,delay:j*110,fill:'forwards'}).onfinish=()=>w.remove()}h=800+(n-1)*110}
   else if(k==='charge'){const sg=B.x>A.x?1:-1,d=B.x-A.x-sg*90,c=em(e.fx,A.x+sg*70,A.y+30,64);
    f.animate([{transform:'none'},{transform:`translateX(${d}px)`,offset:.4},{transform:`translateX(${d}px)`,offset:.5},{transform:`translate(${d/2}px,-110px)`,offset:.75},{transform:'none'}],{duration:1500});
    c.animate([{transform:'none',opacity:1},{transform:`translateX(${d}px)`,opacity:1,offset:.4},{transform:`translateX(${d}px)`,opacity:1,offset:.55},{transform:`translateX(${d}px)`,opacity:0}],{duration:1500,fill:'forwards'}).onfinish=()=>c.remove();h=600}
@@ -299,14 +319,18 @@ async function anim(e){const A=pos(e.who),B=pos(e.to!=null?e.to:1-e.who),f=$('#f
  else if(e.type==='heal'){sfx('heal');
   if(k==='sip'){const p=em(e.fx,A.x+(e.who?-40:40),A.y+30,56),u='translateY(-50px) rotate(-20deg)';p.animate([{transform:'none'},{transform:u},{transform:'none'},{transform:u},{transform:'none'}],{duration:1200}).onfinish=()=>p.remove()}
   else if(k==='box'){const p=em('🎁',A.x,A.y-A.h/2,80);p.animate([{transform:'rotate(0)'},{transform:'rotate(-18deg)'},{transform:'rotate(18deg)'},{transform:'rotate(-18deg)'},{transform:'rotate(18deg) scale(1.3)'},{transform:'scale(.2)',opacity:0}],{duration:1100}).onfinish=()=>{p.textContent='✨';p.animate([{transform:'scale(.5)',opacity:1},{transform:'scale(2)',opacity:0}],{duration:600}).onfinish=()=>p.remove()}}
+  else if(k==='cave'){const sg=B.x>A.x?1:-1,sc=Math.max(4,Math.floor(A.h*.55/14)),cx=A.x+sg*Math.max(110,A.h*.55),cv=caveCv(sc),dx=cx-A.x;cv.style.cssText+=`;position:absolute;left:${cx-10*sc}px;top:${A.y+A.h/2-14*sc}px;z-index:5;transform-origin:50% 100%;pointer-events:none`;$('.arena').appendChild(cv);
+   cv.animate([{transform:'scale(0)'},{transform:'scale(1)',offset:.06},{transform:'scale(1)',offset:.94},{transform:'scale(0)'}],{duration:5500}).onfinish=()=>cv.remove();
+   f.animate([{transform:'none',opacity:1},{transform:`translateX(${dx}px) scale(.7)`,opacity:1,offset:.12},{transform:`translateX(${dx}px) scale(.3)`,opacity:0,offset:.17},{transform:`translateX(${dx}px) scale(.3)`,opacity:0,offset:.86},{transform:`translateX(${dx}px) scale(.7)`,opacity:1,offset:.92},{transform:'none',opacity:1}],{duration:5500});await wait(5300);sfx('heal')}
   else if(k==='sway'){const L='translateX(-35px)',Rr='translateX(35px)';f.animate([{transform:'none'},{transform:L},{transform:Rr},{transform:L},{transform:Rr},{transform:L},{transform:Rr},{transform:'none'}],{duration:800})}
   flt(e.who,e.txt,'#5aff7a')}
  else{sfx('bad');flt(e.who,e.txt,'#ccc')}}
-function panel(s){const P=$('#panel'),me=V.me,t=s.turn;
- if(s.ph==='pick'&&t===me){const c=CHARS[s.ps[me].ch];P.innerHTML=`<div class=acts><button class=btn data-a=n>👊 ${c.atk}<small>答「易」題・傷害15</small></button><button class="btn y" data-a=s>⚡ ${c.sk.n}<small>答「中」題・傷害${c.sk.v}</small></button><button class="btn g" data-a=d>🛡 ${c.df.n}<small>答「中」題・${c.df.d}</small></button></div><div class=wait style="font-size:15px;padding:4px">每回合限時60秒，作答越久效果越低（最低50%）｜答錯：普攻→暫停一回合　技能→被攻擊時多扣血</div>`;
+function panel(s){const P=$('#panel'),M=$('#qm'),me=V.me,t=s.turn;M.classList.remove('on');
+ if(s.ph==='pick'&&t===me){const c=CHARS[s.ps[me].ch];P.innerHTML=`<div class=acts><button class=btn data-a=n>👊 ${c.atk}<small>答「易」題・傷害15</small></button><button class="btn y" data-a=s>⚡ ${c.sk.n}<small>答「中」題・傷害${c.sk.v}</small></button><button class="btn g" data-a=d>🛡 ${c.df.n}<small>答「中」題・${c.df.d}</small></button></div><div class=wait style="font-size:15px;padding:4px">每回合限時60秒，作答越久效果越低（最低50%）｜答錯：普攻→攻擊失敗、直接換對手　技能→被攻擊時多扣血</div>`;
   P.onclick=e=>{const b=e.target.closest('[data-a]');if(b){P.onclick=null;send({t:'act',a:b.dataset.a})}}}
- else if(s.ph==='ask'&&s.q&&(t===me||me<0)){const q=s.q;P.innerHTML=`<div class=q><span class=tag>${q.k==='easy'?'易':'中'}</span>${me<0?'['+esc(s.ps[t].n)+' 作答中] ':''}${q.h}</div>`+q.o.map((o,i)=>`<button class="btn opt" data-i=${i}>${L[i]} ${o}</button>`).join('');
-  P.onclick=me<0?null:e=>{const b=e.target.closest('[data-i]');if(!b)return;P.onclick=null;P.querySelectorAll('.opt').forEach(x=>x.disabled=true);b.classList.add('pk');send({t:'ans',i:+b.dataset.i})}}
+ else if(s.ph==='ask'&&s.q&&(t===me||me<0)){const q0=s.q,q=Object.assign({h:QI[q0.id].question,o:QI[q0.id].options},q0),qh=`<div class=q><span class=tag>${q.k==='easy'?'易':'中'}</span>${me<0?'['+esc(s.ps[t].n)+' 作答中] ':''}${q.h}</div>`+q.o.map((o,i)=>`<button class="btn opt" data-i=${i}>${L[i]} ${o}</button>`).join('');
+  if(me<0){P.innerHTML=qh;P.onclick=null}
+  else{P.onclick=null;P.innerHTML='<div class=wait>作答中…</div>';M.innerHTML='<div class=qcard><div id=qtm></div>'+qh+'</div>';M.classList.add('on');M.onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;M.onclick=null;M.querySelectorAll('.opt').forEach(x=>x.disabled=true);b.classList.add('pk');send({t:'ans',i:+b.dataset.i})}}}
  else{P.onclick=null;P.innerHTML=`<div class=wait>${s.ph==='over'?'戰鬥結束！':s.ph==='res'?'結算中…':t===me?'…':esc(s.ps[t].n)+' 的回合…'}</div>`}}
 $('#bLeave').onclick=()=>{if(V.me<0||confirm('確定離開？離開後對戰結束'))exit()};
 
@@ -315,7 +339,7 @@ function showEnd(s,rv){if(!V.on||END)return;END={s,rv};const w=s.win,me=V.me;sho
  $('#et').textContent=w<0?'平手！':me>=0?(w===me?'🏆 你贏了！':'💀 你輸了…'):`🏆 ${s.ps[w].n} 獲勝！`;
  const tabs=$('#etabs');tabs.innerHTML='';rv.forEach((r,i)=>{if(r.ai)return;const b=document.createElement('button');b.className='btn'+(i===me?' g':'');b.textContent=(i===me?'我：':'')+r.n;b.onclick=()=>rEnd(i);tabs.appendChild(b)});
  $('#bExit').textContent=me<0?'返回房間列表':mode==='host'?'退出並關閉房間':'退出';rEnd(me>=0?me:0)}
-function rEnd(i){const r=END.rv[i],pc=r.tot?Math.round(r.ok/r.tot*100):0;$('#es').textContent=`${r.n}　答對率 ${pc}%（${r.ok}/${r.tot}）`;
+function rEnd(i){const r0=END.rv[i],r=Object.assign({},r0,{wr:r0.wr.map(w=>{const q=QI[w.id];return Object.assign({},w,{h:q.question,o:q.options,a:q.answer,e:q.explanation||''})})}),pc=r.tot?Math.round(r.ok/r.tot*100):0;$('#es').textContent=`${r.n}　答對率 ${pc}%（${r.ok}/${r.tot}）`;
  $('#ew').innerHTML=r.wr.length?`<h2>答錯題目詳解（${r.wr.length}）</h2>`+r.wr.map((w,n)=>`<div class=rv><b>#${n+1}　[${w.k==='easy'?'易':'中'}]</b><div>${w.h}</div>`+w.o.map((o,k)=>`<div class="${k===w.a?'ok':k===w.c?'no':''}">${k===w.a?'✔':k===w.c?'✘':'　'} ${L[k]} ${o}</div>`).join('')+(w.c<0?'<div class=no>⏱ 超時未作答</div>':'')+`<div class=ex>💡 解析：${w.e||'（無解析）'}</div></div>`).join(''):'<h2>🎉 全部答對，沒有錯題！</h2>'}
 function coverBG(){const x=$('#cvbg').getContext('2d'),W=160,H=90,sr=i=>Math.abs(Math.sin(i*12.9898)*43758.5453)%1,R=(a,b,w,h,k)=>{x.fillStyle=k;x.fillRect(a|0,b|0,w|0,h|0)};
  ['#120418','#2a0a3a','#5a0f3a','#a01c2a','#e0481c','#ff8a1c','#ffc94a'].forEach((k,i)=>R(0,i*8,W,9,k));
@@ -326,12 +350,12 @@ function coverBG(){const x=$('#cvbg').getContext('2d'),W=160,H=90,sr=i=>Math.abs
  for(let i=-12;i<=12;i++)for(let y=60;y<H;y++)R(80+i*9*(y-52)/8,y,1,1,'#4a1a14');
  for(let k=0;k<W;k++){const f=4+sr(k)*7+Math.sin(k/3)*2;R(k,60-f,1,f,'#ff6a00');R(k,60-f,1,Math.ceil(f/3),'#ffd84a')}}
 (function(){const row=$('#cvrow');coverBG();
- const sc=Math.max(3,Math.min(9,Math.floor(Math.min(innerWidth/(8*21),innerHeight*.34/24))));
- CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='cvc';d.style.cssText=`animation-delay:${i*.15}s;margin-bottom:${Math.abs(i-3.5)*sc*2.2}px`;d.appendChild(sprite(c.c,sc));const n=document.createElement('div');n.textContent=c.name;d.appendChild(n);row.appendChild(d)});
+ const sc=Math.max(3,Math.min(9,Math.floor(Math.min(innerWidth/(CHARS.length*21),innerHeight*.34/24))));
+ CHARS.forEach((c,i)=>{const d=document.createElement('div');d.className='cvc';d.style.cssText=`animation-delay:${i*.15}s;margin-bottom:${Math.abs(i-(CHARS.length-1)/2)*sc*2.2}px`;d.appendChild(sprite(c.c,sc));const n=document.createElement('div');n.textContent=c.name;d.appendChild(n);row.appendChild(d)});
  const cv=$('#s-cover');for(let i=0;i<28;i++){const e=document.createElement('i');e.className='em';e.style.cssText=`left:${Math.random()*100}%;animation-duration:${4+Math.random()*6}s;animation-delay:${-Math.random()*8}s`;cv.appendChild(e)}
  cv.onclick=()=>{sfx('win');show('s-id')}})();
 $('#bExit').onclick=exit;
-setInterval(()=>{const s=V.s,t=$('#tm');if(!V.on||!s||(s.ph!=='pick'&&s.ph!=='ask')){t.style.display='none';return}const r=Math.max(0,Math.ceil((V.endAt-Date.now())/1000));t.style.display='block';t.classList.toggle('lo',r<=10);let q='⏱ '+r+'s';if(s.ph==='ask')q+='　效果 '+Math.round(Math.max(DECAY_MIN,1-(1-DECAY_MIN)*(Date.now()-V.qAt)/1000/TURN_SEC)*100)+'%';t.textContent=q;if(r<=5&&r>0&&r!==V.lr&&s.turn===V.me)sfx('tick');V.lr=r},250);
+setInterval(()=>{const s=V.s,t=$('#tm');if(!V.on||!s||(s.ph!=='pick'&&s.ph!=='ask')){t.style.display='none';return}const r=Math.max(0,Math.ceil((V.endAt-Date.now())/1000));t.style.display='block';t.classList.toggle('lo',r<=10);let q='⏱ '+r+'s';if(s.ph==='ask')q+='　效果 '+Math.round(Math.max(DECAY_MIN,1-(1-DECAY_MIN)*(Date.now()-V.qAt)/1000/TURN_SEC)*100)+'%';t.textContent=q;const qt=$('#qtm');if(qt)qt.textContent=q;if(r<=5&&r>0&&r!==V.lr&&s.turn===V.me)sfx('tick');V.lr=r},250);
 
 /* ===== 離開 / 關閉房間 ===== */
 function exit(){const was=mode,p=peer;stopBgm();V.on=false;V.key='';END=null;clearInterval(gmTimer);
