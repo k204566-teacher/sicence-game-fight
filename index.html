@@ -78,9 +78,10 @@ select{font:inherit;font-size:20px;padding:8px;background:#000;color:#fff;border
 #s-id>*,#s-menu>*,#s-chap>*,#s-char>*,#s-gm>*,#s-stats>*,#s-end>*,#s-lobby>*{flex-shrink:0}
 #s-chap>.row:last-child,#s-char>.row:last-child{position:sticky;bottom:0;width:100%;background:#14122bee;padding:8px;z-index:5}
 .arena .hud{width:min(42%,330px)}
+#cf{position:fixed;inset:0;background:#000c;z-index:40;display:none;align-items:center;justify-content:center;padding:10px}#cf.on{display:flex}#bLeave{z-index:8}
 #toast{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c0283a;border:3px solid #fff;padding:8px 16px;display:none;z-index:30}
 </style></head><body>
-<div id="toast"></div><div id="qm"></div><button class="btn" id="snd">🔊</button>
+<div id="toast"></div><div id="qm"></div><div id="cf"><div class="qcard" style="max-width:420px;text-align:center"><div id="cft" style="font-size:22px;padding:10px"></div><div class="row"><button class="btn r" id="cfy">確定</button><button class="btn" id="cfn">取消</button></div></div></div><button class="btn" id="snd">🔊</button>
 
 <div id="s-cover" class="scr on">
  <canvas id="cvbg" width="160" height="90"></canvas><div class="rays"></div><div id="cvfl"></div>
@@ -205,6 +206,7 @@ const base=()=>location.href.split('#')[0];
 function qr(el,url){el.innerHTML='';if(typeof QRCode==='undefined'||location.protocol==='file:'){el.textContent=location.protocol==='file:'?'（需先把本檔放到網站上，QR 才能讓學生掃描）':url;return}new QRCode(el,{text:url,width:210,height:210,correctLevel:QRCode.CorrectLevel.M})}
 try{$('#nm').value=localStorage.getItem('pdname')||''}catch(e){}
 (function(){const m=location.hash.match(/^#r(\d{4})$/);if(m){$('#jc').value=m[1];show('s-menu');toast('已帶入房號 '+m[1]+'，輸入名字後按「加入對戰」')}})();
+function ask(msg,yes){$('#cft').textContent=msg;$('#cf').classList.add('on');$('#cfy').onclick=()=>{$('#cf').classList.remove('on');yes()};$('#cfn').onclick=()=>$('#cf').classList.remove('on')}
 function keepAwake(){try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&V.on)keepAwake()});
 function splashFx(B){for(let j=0;j<8;j++){const f=em(j<3?'🎨':'🔥',B.x+(Math.random()*90-45),B.y+(Math.random()*120-70),j<3?36:56);f.style.opacity=0;f.animate([{transform:'scale(.3)',opacity:1},{transform:'scale(1.2) translateY(-20px)',opacity:1,offset:.5},{transform:'scale(1) translateY(-60px)',opacity:0}],{duration:1600,delay:j*120,fill:'forwards'}).onfinish=()=>f.remove()}}
@@ -329,7 +331,7 @@ function renderStats(){const f=$('#stf'),cur=f.value||'all',codes=Object.keys(ST
  const rows=Object.entries(agg).filter(([id,e])=>e.w>0&&QI[id]).sort((a,b)=>b[1].w/b[1].n-a[1].w/a[1].n||b[1].w-a[1].w),tn=Object.values(agg).reduce((s,e)=>s+e.n,0),tw=Object.values(agg).reduce((s,e)=>s+e.w,0);
  $('#stl').innerHTML=`<div style="color:#ffd84a;margin-bottom:6px">共作答 ${tn} 次，答錯 ${tw} 次，有 ${rows.length} 題被答錯過（依錯誤率高到低，點開看詳解）</div>`+(rows.length?rows.map(([id,e],i)=>{const q=QI[id],t=q.question.replace(/<img[^>]*>/g,'🖼').replace(/<[^>]+>/g,'').slice(0,70);return `<details class=strow><summary><b>#${i+1}</b>　錯誤率 <b style="color:#ff8a8a">${Math.round(e.w/e.n*100)}%</b>（${e.w}/${e.n}）　${esc(t)}</summary><div class=rv><div>${q.question}</div>`+q.options.map((o,k)=>`<div class="${k===q.answer?'ok':''}">${k===q.answer?'✔':'　'} ${L[k]} ${o}</div>`).join('')+`<div class=ex>💡 解析：${q.explanation||'（無解析）'}</div></div></details>`}).join(''):'目前沒有答錯紀錄')}
 $('#bStats').onclick=()=>{renderStats();show('s-stats')};$('#stf').onchange=renderStats;$('#bStBack').onclick=()=>show('s-gm');
-$('#bClr').onclick=()=>{if(confirm('確定清空所有房間的答錯統計？此動作無法復原')){STAT={};saveStat();renderStats()}};
+$('#bClr').onclick=()=>{ask('確定清空所有房間的答錯統計？此動作無法復原',()=>{STAT={};saveStat();renderStats()})};
 /* ===== 對戰畫面 ===== */
 function stt(p){return p.st==='ask'?'🧠':p.st==='cool'?(p.ck==='pen'?'⏸':p.ck==='dz'?'💫':''):''}
 function layout(){const A=$('.arena');['0','1'].forEach(n=>{const f=$('#f'+n),p=$('#p'+n),hd=$('#h'+n),w=f.offsetWidth*1.8;p.style.left=f.offsetLeft+f.offsetWidth/2-w/2+'px';p.style.top=f.offsetTop+f.offsetHeight-w*.1+'px';p.style.width=w+'px';p.style.height=w*.2+'px';
@@ -385,7 +387,7 @@ function panel(s){const P=$('#panel'),M=$('#qm'),me=V.me,mp=me>=0?s.ps[me]:null,
  if(mp.st==='idle'){const c=CHARS[mp.ch];P.innerHTML=`<div class=acts><button class=btn data-a=n>👊 ${c.atk}<small>答「易」題・約${Math.round(15*mp.at)}傷害</small></button><button class="btn y" data-a=s>⚡ ${c.sk.n}<small>答「中」題・約${Math.round(c.sk.v*mp.at)}傷害</small></button><button class="btn g" data-a=d>🛡 ${c.df.n}<small>答「中」題・${c.df.d}</small></button></div><div class=wait style="font-size:15px;padding:4px">答對立刻出招、答錯暫停${PEN_SEC}秒；作答越久效果越低（最低50%，${TURN_SEC}秒內需作答）｜戰鬥${BATTLE_SEC}秒，時間到血量高者勝</div>`;
   P.onclick=e=>{const b=e.target.closest('[data-a]');if(b){P.onclick=null;send({t:'act',a:b.dataset.a})}};return}
  P.onclick=null;P.innerHTML=mp.ck==='pen'?'<div class=wait>⏸ 答錯了！暫停行動 <b id=cdt></b> 秒</div>':mp.ck==='dz'?'<div class=wait>💫 被暈眩！<b id=cdt></b> 秒後恢復</div>':'<div class=wait>…</div>'}
-$('#bLeave').onclick=()=>{if(V.me<0||confirm('確定離開？離開後對戰結束'))exit()};
+$('#bLeave').onclick=()=>{if(V.me<0)exit();else ask('確定離開？離開後對戰結束',exit)};
 
 /* ===== 結算 ===== */
 function showEnd(s,rv){if(!V.on||END)return;END={s,rv};const w=s.win,me=V.me;show('s-end');stopBgm();sfx(w<0?'bad':(me<0||w===me)?'win':'lose');
